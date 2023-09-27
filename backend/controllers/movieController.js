@@ -1,16 +1,16 @@
-const config = require("../config/config") 
-const prisma = require("../config/db");
+const {prisma} = require("../config/db")
+const constants = require("../config/constants")
 // Function to list all movies for the currently logged-in user
 const listMovies = async (req) => {
     try {
       const userId = req.user.id; 
       console.log(userId); // Assuming you have user information in the session
       const user = await prisma.user.findUnique({
-        where: { id: userId,  isActive: config.IsActive},
+        where: { id: userId,  isActive: constants.IS_ACTIVE},
         include: {
           movies: {
             where: {
-              isActive: config.IsActiveDefault,
+              isActive: constants.IS_ACTIVE,
             }
           },
         }
@@ -29,23 +29,17 @@ const addMovie = async (req, res) => {
     const userId = req.user.id; // Assuming you have user information in the session
     const { name, rating, movieCast, genre, releaseDate } = req.body;
     try {
-      const movie = await prisma.user.create({
-        where: {id: userId},
-        include: {
-          movie: {
-            data: {
-              name,
-              rating,
-              movieCast,
-              genre,
-              releaseDate: new Date(releaseDate),
-              userId: userId, // Associate the movie with the logged-in user
-            },
-          }
-        }
-        
-      });
-      res.redirect('/movies');
+      const movie = await prisma.movie.create({
+        data: {
+          name,
+          rating,
+          movieCast,
+          genre,
+          releaseDate: new Date(releaseDate),
+          userId: userId, // Associate the movie with the logged-in user
+        },
+        });
+      res.status(201).json({"data": movie});
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Unable to add the movie' });
@@ -53,11 +47,14 @@ const addMovie = async (req, res) => {
   };
 
   const updateMovie = async (req, res) => {
-    const { id } = req.params;
-    const { name, rating, movieCast, genre, releaseDate } = req.body;
+    const { id, name, rating, movieCast, genre, releaseDate } = req.body;
+    
+    if (!Array.isArray(movieCast) || movieCast.some((item) => typeof item !== 'string')) {
+      return res.status(400).json({ error: 'movieCast must be an array of strings' });
+    }
     try {
-      await prisma.movie.update({
-        where: { id: parseInt(id) },
+      const movie = await prisma.movie.update({
+        where: { id: (id) },
         data: {
           name,
           rating,
@@ -66,7 +63,7 @@ const addMovie = async (req, res) => {
           releaseDate: new Date(releaseDate),
         },
       });
-      res.redirect('/dashboard'); // Redirect to the dashboard or movie list
+      res.status(200).json({data: movie}); // Redirect to the dashboard or movie list
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Unable to update the movie' });
@@ -75,15 +72,15 @@ const addMovie = async (req, res) => {
 
   // Function to delete a movie
 const deleteMovie = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.body;
     try {
-      await prisma.movie.delete({
-        where: { id: parseInt(id) },
+      const movie = await prisma.movie.update({
+        where: { id: id },
         data: {
-            isActive: config.IsNotActive
+            isActive: constants.IS_NOT_ACTIVE
         },
       });
-      res.redirect('/dashboard'); // Redirect to the dashboard or movie list
+      res.status(200).json({data: movie}) // Redirect to the dashboard or movie list
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Unable to delete the movie' });

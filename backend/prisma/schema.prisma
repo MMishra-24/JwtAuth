@@ -24,7 +24,6 @@ model Movie {
 
 model User {
   id       Int      @id @default(autoincrement())
-  username    String
   password String
   email    String   @unique
   isActive Int @default(1)
