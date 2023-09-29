@@ -14,7 +14,7 @@ function AddMovie({ setMovies }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if(name === "movieCast"){
-      let movieCast = value.split(', ');
+      let movieCast = value.split(',').map((item) => item.trim());;
       setNewMovie({
         ...newMovie,
         [name]: movieCast,
@@ -32,7 +32,7 @@ function AddMovie({ setMovies }) {
     try {
       // Send a POST request to your backend to add a new movie
       const token = localStorage.getItem('token');
-      await axios.post(
+      const response = await axios.post(
         constants.HOST_URL + '/movie',
         newMovie, // Send the entire newMovie object
         {
@@ -41,10 +41,12 @@ function AddMovie({ setMovies }) {
           },
         }
       );
+      const newUpdatedMovie = {...newMovie, id: response.data.data.id}
       // Update the movie list
-      setMovies((prevMovies) => [...prevMovies, newMovie]);
+      setMovies((prevMovies) => [...prevMovies, newUpdatedMovie]);
       // Reset the form
       setNewMovie({
+        id: null,
         name: '',
         rating: 0,
         movieCast: [],

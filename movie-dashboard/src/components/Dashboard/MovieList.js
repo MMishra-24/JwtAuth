@@ -129,7 +129,7 @@ function MovieList({ movies, setMovies }) {
                       type="text"
                       value={updatedMovie.movieCast.join(', ')}
                       onChange={(e) =>
-                        setUpdatedMovie({ ...updatedMovie, movieCast: e.target.value.split(', ') })
+                        setUpdatedMovie({ ...updatedMovie, movieCast: e.target.value.split(',').map((item) => item.trim()) })
                       }
                     />
                   </td>
