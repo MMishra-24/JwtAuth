@@ -5,9 +5,17 @@
                         <h2>NODE.JS MVC</h2>  
                         <div class="card">
                             <div class="card-header">Login</div>
+                            <div id="alertContainer" class="d-none">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    User not found. Please check your input.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
                             <div class="card-body">
 
-                                <form class="form-horizontal" method="post" action="/login">
+                                <form id = "loginForm" class="form-horizontal" method="post">
 
                                 
                                     <div class="form-group">
@@ -43,6 +51,45 @@
                     </div>
                 </div>
 </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const formDataObject = {};
+
+        // Convert FormData to JSON object
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+        try {
+            const response = await fetch('http://localhost:4111/login', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json'
+                    },
+                body: JSON.stringify(formDataObject)
+            });
+            console.log(response)
+            console.log(response.status, response.statusText)
+            if (response.ok) {
+                const data = await response.json();
+                // Store the JWT token in localStorage
+                localStorage.setItem('token', data.token);
+                console.log(localStorage.getItem('token'))
+                // Redirect to the dashboard
+                window.location.href = 'http://localhost:8000/dashboard';
+            } else if (response.status === 401) {
+                // Display the alert
+                const alertContainer = document.getElementById('alertContainer');
+                alertContainer.classList.remove('d-none');
+                console.error('Login failed.');
+            }
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });
+</script>
 
 </body>
 </html>

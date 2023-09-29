@@ -8,7 +8,6 @@ app.set("view engine", "ejs");
 //BodyParsing
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
-
   
 //Routes
 app.use("/", require("./routes/urls"));
