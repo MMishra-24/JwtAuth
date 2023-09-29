@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import * as constants from "../../config/constants"
 function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
   const handleLogin = async () => {
     try {
@@ -15,12 +17,15 @@ function Auth() {
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Login error:', error);
+      setError('Login failed. Please check your email and password.'); // Set error message
+    
     }
   };
 
   return (
     <div>
       <h1>Login</h1>
+      {error && <div className="error-alert">{error}</div>}
       <input
         type="email"
         placeholder="Email"
@@ -34,6 +39,9 @@ function Auth() {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={handleLogin}>Login</button>
+      <p>
+        Don't have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
 }

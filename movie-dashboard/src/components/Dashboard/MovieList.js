@@ -26,7 +26,6 @@ function MovieList({ movies, setMovies }) {
     try {
       // Send a PATCH request to backend to update the movie
       const token = localStorage.getItem('token');
-      console.log(updatedMovie);
       await axios.patch(
         constants.HOST_URL + `/movie`,
         updatedMovie,
@@ -161,7 +160,7 @@ function MovieList({ movies, setMovies }) {
                 <>
                   <td>{movie.name}</td>
                   <td>{movie.rating}</td>
-                  <td>{movie.movieCast.join(', ')}</td> {/* Display the movie cast as a comma-separated string */}
+                  <td>{movie.movieCast.join(', ')}</td>
                   <td>{movie.genre}</td>
                   <td>{movie.releaseDate.substring(0, 10)}</td>
                   <td>

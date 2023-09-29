@@ -3,8 +3,7 @@ const constants = require("../config/constants")
 // Function to list all movies for the currently logged-in user
 const listMovies = async (req) => {
     try {
-      const userId = req.user.id; 
-      console.log(userId); // Assuming you have user information in the session
+      const userId = req.user.id; //user information in the session
       const user = await prisma.user.findUnique({
         where: { id: userId,  isActive: constants.IS_ACTIVE},
         include: {
@@ -15,8 +14,6 @@ const listMovies = async (req) => {
           },
         }
       });
-      console.log(user);
-      console.log(user.movies);
       return user.movies; // Return the list of movies
     } catch (error) {
       console.error(error);
