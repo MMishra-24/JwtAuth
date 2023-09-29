@@ -32,6 +32,9 @@ const registerUser =  async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  if(!email || !password) {
+    res.status(500).json({ error: "email or password is incorrect"})
+  }
 
   try {
     const { user, token } = await authenticateUser(email, password);

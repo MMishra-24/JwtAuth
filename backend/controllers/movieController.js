@@ -28,11 +28,15 @@ const listMovies = async (req) => {
 const addMovie = async (req, res) => {
     const userId = req.user.id; // Assuming you have user information in the session
     const { name, rating, movieCast, genre, releaseDate } = req.body;
+    const movieRating = parseFloat(rating)
+    if (!Array.isArray(movieCast) || movieCast.some((item) => typeof item !== 'string')) {
+      return res.status(400).json({ error: 'movieCast must be an array of strings' });
+    }
     try {
       const movie = await prisma.movie.create({
         data: {
           name,
-          rating,
+          rating: movieRating,
           movieCast,
           genre,
           releaseDate: new Date(releaseDate),
@@ -48,16 +52,19 @@ const addMovie = async (req, res) => {
 
   const updateMovie = async (req, res) => {
     const { id, name, rating, movieCast, genre, releaseDate } = req.body;
+    if(!id || !name || !rating || !movieCast || !genre || !releaseDate){
+      res.status(400).json({ error: 'Unable to update the movie' });
+    }
     
     if (!Array.isArray(movieCast) || movieCast.some((item) => typeof item !== 'string')) {
       return res.status(400).json({ error: 'movieCast must be an array of strings' });
     }
     try {
       const movie = await prisma.movie.update({
-        where: { id: (id) },
+        where: { id: (parseInt(id)) },
         data: {
           name,
-          rating,
+          rating: parseFloat(rating),
           movieCast,
           genre,
           releaseDate: new Date(releaseDate),
@@ -66,7 +73,7 @@ const addMovie = async (req, res) => {
       res.status(200).json({data: movie}); // Redirect to the dashboard or movie list
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Unable to update the movie' });
+      res.status(400).json({ error: 'Unable to update the movie' });
     }
   };
 
